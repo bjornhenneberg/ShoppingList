@@ -43,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         shoppingList =  getArrayVal(getApplicationContext());
-        //Collections.addAll(shoppingList, "Eggs", "Yogurt", "Milk", "Bananas", "Apples", "Tide with bleach", "Cascade");
-        //shoppingList.addAll(Arrays.asList("Napkins", "Dog food", "Chapstick", "Bread"));
-        //shoppingList.add("Sunscreen");
-        // shoppingList.add("Toothpaste");
         Collections.sort(shoppingList);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, shoppingList);
         lv = (ListView) findViewById(R.id.listView);
@@ -54,25 +50,7 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                builder.setTitle("Title");
-                builder.setItems(new CharSequence[]
-                                {"button 1", "button 2", "button 3", "button 4"},
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
-                                switch (which) {
-                                    case 0:
-                                        Toast.makeText(getApplicationContext(), "clicked 1", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case 1:
-                                        Toast.makeText(getApplicationContext(), "clicked 2", Toast.LENGTH_SHORT).show();
-                                        break;
-                                }
-                            }
-                        });
-                builder.create().show();
+            removeElement(this.toString(),position);
             }
         });
     }
@@ -112,7 +90,26 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    public void removeElement(String selectedItem, final int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Do you want to delete this item?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                shoppingList.remove(position);
+                Collections.sort(shoppingList);
+                storeArrayVal(shoppingList, getApplicationContext());
+                lv.setAdapter(adapter);
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -121,11 +118,6 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_sort) {
-            Collections.sort(shoppingList);
-            lv.setAdapter(adapter);
-            return true;
-        }
         if(id == R.id.action_add){
 
          AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -135,20 +127,29 @@ public class MainActivity extends AppCompatActivity {
          builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
              @Override
              public void onClick(DialogInterface dialog, int which) {
+                 if (input.getText()!= null){
                  shoppingList.add(preferredCase(input.getText().toString().trim()));
+                 }
                  Collections.sort(shoppingList);
                  storeArrayVal(shoppingList,getApplicationContext());
                  lv.setAdapter(adapter);
+                 ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(input.getWindowToken(), 0);
+
              }
          });
          builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
              @Override
              public void onClick(DialogInterface dialog, int which) {
                  dialog.cancel();
+                 ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(input.getWindowToken(), 0);
+
              }
          });
          builder.show();
-         return true;
+            input.requestFocus();
+            ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+            return true;
         }
 
         if (id == R.id.action_clear){

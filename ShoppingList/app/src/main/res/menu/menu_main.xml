@@ -4,12 +4,6 @@
     tools:context="xyz.henneberg.shoppinglist.MainActivity">
 
     <item
-        android:id="@+id/action_sort"
-        android:orderInCategory="200"
-        android:title="@string/action_sort"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_clear"
         android:orderInCategory="300"
         android:title="@string/action_clear"
